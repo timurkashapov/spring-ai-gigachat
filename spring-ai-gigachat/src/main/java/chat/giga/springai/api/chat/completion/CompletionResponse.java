@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,9 @@ import lombok.experimental.Accessors;
 public class CompletionResponse {
     @JsonIgnore
     private String id = ""; // проставляется из http-заголовка 'x-request-id' ответа модели
+
+    @JsonProperty("thread_id")
+    Optional<String> threadId;
 
     private List<Choice> choices;
     private Long created;

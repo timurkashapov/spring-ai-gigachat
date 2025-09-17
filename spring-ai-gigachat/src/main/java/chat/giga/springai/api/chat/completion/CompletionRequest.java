@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,6 +31,9 @@ public class CompletionRequest {
 
     @JsonProperty("functions")
     private List<FunctionDescription> functions;
+
+    @JsonProperty("storage")
+    private Storage storage;
 
     @JsonProperty("temperature")
     private Double temperature;
@@ -97,6 +101,26 @@ public class CompletionRequest {
             this.attachments = attachments;
         }
     }
+
+    /**
+     * Данные для хранения контекста на стороне GigaChat
+     *
+     * @param isStateful Режим сохранения сообщений контекста.
+     *                   При работе с данным режимом не требуется передавать сообщения контекста каждый раз.
+     *                   Достаточно передать только новое сообщение
+     * @param limit Максимальное количество сообщений исторического контекста, которые посылаются в модель в запросе.
+     *              Если пользователь передает limit на генерацию ответа от модели и у него есть system в истории или инструкция у ассистента, то кол-во сообщений отправленных в модель = limit + 1, т.е. к лимиту добавляется систем промпт.
+     *              Если параметр не передан, считаем что необходимо отправить весь контекст.
+     * @param threadId Идентификатор треда.
+     *                 Не заполняется для первого сообщения.
+     * @param metadata Дополнительные метаданные.
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record Storage(
+            @JsonProperty(value = "is_stateful", required = true) boolean isStateful,
+            @JsonProperty("limit") Optional<Integer> limit,
+            @JsonProperty("thread_id") Optional<String> threadId,
+            @JsonProperty("metadata") Optional<Object> metadata) {}
 
     /**
      * Описание функции.
