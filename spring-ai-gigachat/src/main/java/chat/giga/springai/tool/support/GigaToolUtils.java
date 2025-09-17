@@ -33,10 +33,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.util.JacksonUtils;
 import org.springframework.ai.util.json.schema.JsonSchemaGenerator;
+import org.springframework.ai.util.json.schema.JsonSchemaGenerator.SchemaOption;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Utils for supporting the work of Tool Calling API with GigaChat LLM.
@@ -91,14 +93,17 @@ public final class GigaToolUtils {
             return null;
         }
         Class<?> returnType = method.getReturnType();
-        return generateJsonSchemaForOutputType(returnType);
+        SchemaOption[] schemaOptions = gigaTool.generateSchemaOptions();
+        return ObjectUtils.isEmpty(schemaOptions)
+                ? generateJsonSchemaForOutputType(returnType)
+                : generateJsonSchemaForOutputType(returnType, schemaOptions);
     }
 
     /**
      * Generates json schema for output type.
      * Returns null if type is String, Enum, primitive or array.
      */
-    public static String generateJsonSchemaForOutputType(Type type) {
+    public static String generateJsonSchemaForOutputType(Type type, SchemaOption... schemaOptions) {
         if (type instanceof Class clazz) {
             var javaType = ClassUtils.resolvePrimitiveIfNecessary(clazz);
             if (javaType == String.class
@@ -116,7 +121,7 @@ public final class GigaToolUtils {
                 return null;
             }
         }
-        return JsonSchemaGenerator.generateForType(type);
+        return JsonSchemaGenerator.generateForType(type, schemaOptions);
     }
 
     /**

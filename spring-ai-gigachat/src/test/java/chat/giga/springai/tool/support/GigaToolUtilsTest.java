@@ -1,5 +1,6 @@
 package chat.giga.springai.tool.support;
 
+import static com.networknt.schema.SpecVersion.VersionFlag.V202012;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
@@ -9,8 +10,11 @@ import static org.mockito.Mockito.when;
 import chat.giga.springai.tool.annotation.FewShotExample;
 import chat.giga.springai.tool.annotation.FewShotExampleList;
 import chat.giga.springai.tool.annotation.GigaTool;
+import com.networknt.schema.JsonSchemaFactory;
+import io.restassured.module.jsv.JsonSchemaValidator;
 import java.lang.reflect.Method;
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.util.Arrays;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +25,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.util.json.schema.JsonSchemaGenerator;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,6 +75,21 @@ public class GigaToolUtilsTest {
     public void testGenerateJsonSchemaForMethodOutput_withGigaToolAnnotation_generationEnabled() {
         GigaTool gigaToolAnnotation = Mockito.mock(GigaTool.class);
         Mockito.when(gigaToolAnnotation.generateOutputSchema()).thenReturn(true);
+        annotatedElementUtilsMock
+                .when(() -> AnnotatedElementUtils.findMergedAnnotation(eq(method), eq(GigaTool.class)))
+                .thenReturn(gigaToolAnnotation);
+        when(method.getReturnType()).thenAnswer(invocation -> TestRecord.class);
+
+        String jsonSchema = GigaToolUtils.generateJsonSchemaForMethodOutput(method);
+
+        assertTrue(StringUtils.isNotBlank(jsonSchema));
+    }
+
+    @Test
+    public void testGenerateJsonSchemaForMethodOutput_withGigaToolAnnotation_generateSchemaOptions() {
+        GigaTool gigaToolAnnotation = Mockito.mock(GigaTool.class);
+        Mockito.when(gigaToolAnnotation.generateOutputSchema()).thenReturn(true);
+        Mockito.when(gigaToolAnnotation.generateSchemaOptions()).thenReturn(Arrays.array(JsonSchemaGenerator.SchemaOption.UPPER_CASE_TYPE_VALUES));
         annotatedElementUtilsMock
                 .when(() -> AnnotatedElementUtils.findMergedAnnotation(eq(method), eq(GigaTool.class)))
                 .thenReturn(gigaToolAnnotation);

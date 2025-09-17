@@ -4,6 +4,7 @@ import chat.giga.springai.tool.execution.GigaToolCallResultConverter;
 import java.lang.annotation.*;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.execution.ToolCallResultConverter;
+import org.springframework.ai.util.json.schema.JsonSchemaGenerator;
 import org.springframework.core.annotation.AliasFor;
 
 /**
@@ -52,4 +53,9 @@ public @interface GigaTool {
      * Whether to generate 'return_parameters' in function description for request to GigaChat LLM.
      */
     boolean generateOutputSchema() default true;
+
+    /**
+     * Options for generating JSON Schemas.
+     */
+    JsonSchemaGenerator.SchemaOption[] generateSchemaOptions() default {};
 }

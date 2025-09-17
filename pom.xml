@@ -64,6 +64,7 @@
         <ayza.version>10.0.0</ayza.version>
         <lombok.version>1.18.38</lombok.version>
         <wiremock-spring-boot.version>3.10.6</wiremock-spring-boot.version>
+        <json-schema-validator.version>5.5.6</json-schema-validator.version> <!-- https://mvnrepository.com/artifact/io.rest-assured/json-schema-validator -->
 
         <maven.deploy.plugin.version>3.1.4</maven.deploy.plugin.version>
     </properties>
@@ -116,6 +117,11 @@
                 <artifactId>wiremock-spring-boot</artifactId>
                 <version>${wiremock-spring-boot.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>json-schema-validator</artifactId>
+                <version>${json-schema-validator.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
